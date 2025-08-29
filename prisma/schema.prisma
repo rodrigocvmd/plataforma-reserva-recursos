@@ -15,6 +15,13 @@ enum UserRole {
   USER
 }
 
+enum ReservationStatus {
+  CONFIRMADO
+  PENDENTE
+  CANCELADO
+  FINALIZADO
+}
+
 model User {
   id           String        @id @default(cuid())
   email        String        @unique
@@ -39,6 +46,16 @@ model Resource {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   Comment        Comment[]
+  Blocked        Blocked[]
+}
+
+model Blocked {
+  id           String   @id @default(cuid())
+  resourceId   String
+  resource     Resource @relation(fields: [resourceId], references: [id])
+  blockedStart DateTime
+  blockedEnd   DateTime
+  reason       String
 }
 
 model Availability {
@@ -52,15 +69,16 @@ model Availability {
 }
 
 model Reservation {
-  id         String   @id @default(cuid())
+  id         String            @id @default(cuid())
   startTime  DateTime
   endTime    DateTime
-  user       User     @relation(fields: [userId], references: [id])
+  user       User              @relation(fields: [userId], references: [id])
   userId     String
-  resource   Resource @relation(fields: [resourceId], references: [id])
+  resource   Resource          @relation(fields: [resourceId], references: [id])
   resourceId String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  status     ReservationStatus @default(PENDENTE)
 }
 
 model Comment {
@@ -71,4 +89,5 @@ model Comment {
   user       User     @relation(fields: [userId], references: [id])
   resource   Resource @relation(fields: [resourceId], references: [id])
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
